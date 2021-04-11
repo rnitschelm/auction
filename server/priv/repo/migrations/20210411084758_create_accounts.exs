@@ -7,7 +7,7 @@ defmodule Server.Repo.Migrations.CreatePeople do
     create table(:users) do
       add :activated_at, :naive_datetime
       add :email, :citext, null: false
-      add :password, :string
+      add :password_hash, :string
 
       timestamps()
     end

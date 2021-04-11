@@ -5,17 +5,31 @@ defmodule Server.Accounts.User do
   schema "users" do
     field :activated_at, :naive_datetime
     field :email, :string
+    field :password, :string, virtual: true, redact: true
+    field :password_hash, :string
 
     timestamps()
   end
 
   @doc false
-  def changeset(user, attrs) do
+  def create_changeset(user, attrs) do
     user
-    |> cast(attrs, [:email])
-    |> validate_required([:email])
+    |> cast(attrs, [:email, :password])
+    |> validate_required([:email, :password])
     |> validate_format(:email, ~r/@/)
     |> validate_length(:email, min: 5, max: 256)
+    |> validate_length(:password, min: 8, max: 100)
     |> unique_constraint(:email)
+    |> put_pass_hash()
+  end
+
+  defp put_pass_hash(changeset) do
+    case changeset do
+      %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
+        put_change(changeset, :password_hash, Pbkdf2.hash_pwd_salt(pass))
+
+      _ ->
+        changeset
+    end
   end
 end

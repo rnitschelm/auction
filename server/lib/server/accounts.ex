@@ -13,7 +13,7 @@ defmodule Server.Accounts do
 
   def register(registration) do
     Multi.new()
-    |> Multi.insert(:user, User.changeset(%User{}, registration))
+    |> Multi.insert(:user, User.create_changeset(%User{}, registration))
     |> Multi.merge(fn %{user: user} ->
       create_associations(registration, user)
     end)
