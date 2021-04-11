@@ -2,9 +2,12 @@ defmodule Server.Repo.Migrations.CreatePeople do
   use Ecto.Migration
 
   def change do
+    execute "CREATE EXTENSION citext"
 
     create table(:users) do
       add :activated_at, :naive_datetime
+      add :email, :citext, null: false
+      add :password, :string
 
       timestamps()
     end
@@ -18,5 +21,6 @@ defmodule Server.Repo.Migrations.CreatePeople do
     end
 
     create index(:people, [:user_id])
+    create unique_index(:users, [:email])
   end
 end

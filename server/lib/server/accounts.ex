@@ -6,14 +6,25 @@ defmodule Server.Accounts do
   import Ecto.Query, warn: false
 
   alias Ecto
+  alias Ecto.Multi
   alias Server.Repo
   alias Server.Accounts.User
   alias Server.Accounts.Person
 
-  def register(%{first_name: first_name, last_name: last_name}) do
-    %Person{}
-    |> Person.changeset(%{first_name: first_name, last_name: last_name})
-    |> Ecto.Changeset.put_assoc(:user, %User{})
-    |> Repo.insert()
+  def register(registration) do
+    Multi.new()
+    |> Multi.insert(:user, User.changeset(%User{}, registration))
+    |> Multi.merge(fn %{user: user} ->
+      create_associations(registration, user)
+    end)
+    |> Repo.transaction()
+  end
+
+  defp create_associations(registration, user) do
+    Multi.new()
+    |> Multi.insert(
+      :person,
+      Person.create_changeset(%Person{}, Map.put(registration, :user_id, user.id))
+    )
   end
 end
