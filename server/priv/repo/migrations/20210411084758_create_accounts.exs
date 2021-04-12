@@ -4,10 +4,18 @@ defmodule Server.Repo.Migrations.CreatePeople do
   def change do
     execute "CREATE EXTENSION citext"
 
+    create table(:companies) do
+      add :name, :string, null: false
+
+      timestamps()
+    end
+
     create table(:users) do
       add :activated_at, :naive_datetime
       add :email, :citext, null: false
-      add :password_hash, :string
+      add :password_hash, :string, null: false
+      add :status, :string, null: false, default: "draft"
+      add :company_id, references(:companies, on_delete: :restrict), null: false
 
       timestamps()
     end
@@ -21,6 +29,9 @@ defmodule Server.Repo.Migrations.CreatePeople do
     end
 
     create index(:people, [:user_id])
+
+    create index(:users, [:company_id])
+
     create unique_index(:users, [:email])
   end
 end
