@@ -10,23 +10,16 @@ defmodule Server.Accounts do
   alias Server.Repo
   alias Server.Accounts.User
   alias Server.Accounts.Person
-  alias Server.Accounts.Company
-
-  def register(registration) do
-    Multi.new()
-    |> Multi.insert(:company, Company.create_changeset(%Company{}, Map.put(registration, :name, registration.company_name)))
-    |> Multi.merge(fn %{company: company} -> create_user(registration, company) end)
-    |> Multi.merge(fn %{user: user} -> create_user_associations(registration, user) end)
-    |> Repo.transaction()
-  end
 
   def list_users() do
     Repo.all(User)
   end
 
-  defp create_user(registration, company) do
+  def register(registration) do
     Multi.new()
-    |> Multi.insert(:user, User.create_changeset(%User{}, Map.put(registration, :company_id, company.id)))
+    |> Multi.insert(:user, User.create_changeset(%User{}, registration))
+    |> Multi.merge(fn %{user: user} -> create_user_associations(registration, user) end)
+    |> Repo.transaction()
   end
 
   defp create_user_associations(registration, user) do

@@ -2,8 +2,6 @@ defmodule Server.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Server.Accounts.Company
-
   schema "users" do
     field :activated_at, :naive_datetime
     field :email, :string
@@ -11,16 +9,14 @@ defmodule Server.Accounts.User do
     field :password_hash, :string
     field :status, Ecto.Enum, values: [:draft, :active, :inactive], default: :draft
 
-    belongs_to :company, Company
-
     timestamps()
   end
 
   @doc false
   def create_changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password, :company_id])
-    |> validate_required([:email, :password, :company_id])
+    |> cast(attrs, [:email, :password])
+    |> validate_required([:email, :password])
     |> validate_format(:email, ~r/@/)
     |> validate_length(:email, min: 5, max: 256)
     |> validate_length(:password, min: 8, max: 100)
