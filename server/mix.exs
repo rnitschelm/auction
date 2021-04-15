@@ -44,7 +44,9 @@ defmodule Server.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.0"},
-      {:comeonin, "~> 5.0"}
+      {:comeonin, "~> 5.0"},
+      {:httpoison, "~> 1.8.0"},
+      {:poison, "~> 3.1"}
     ]
   end
 
